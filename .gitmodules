@@ -1,0 +1,4 @@
+[submodule "RIOT"]
+	path = RIOT
+	url = https://github.com/aabadie/RIOT.git
+	branch = scum_support
