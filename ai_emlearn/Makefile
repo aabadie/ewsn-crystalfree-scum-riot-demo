@@ -4,8 +4,6 @@ BOARD ?= native
 
 USEPKG += emlearn
 
-BLOBS += digit
-
 RIOTBASE ?= $(CURDIR)/../RIOT
 include $(RIOTBASE)/Makefile.include
 
