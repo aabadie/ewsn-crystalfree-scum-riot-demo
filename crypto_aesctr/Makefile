@@ -1,6 +1,6 @@
 APPLICATION = crypto_aesctr
 
-BOARD ?= native
+BOARD ?= scum-devkit
 
 USEMODULE += crypto
 USEMODULE += crypto_aes_128
