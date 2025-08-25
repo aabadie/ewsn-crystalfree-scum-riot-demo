@@ -1,4 +1,4 @@
-## Demo applications for RIOT Port on SCuM
+## Demo applications for the RIOT Port on SCuM
 
 This repositories contains 2 [RIOT](https://riot-os.org) applications that can
 be used with the [SCuM chip](https://crystalfree.org):
