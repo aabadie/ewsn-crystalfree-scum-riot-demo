@@ -1,6 +1,6 @@
 APPLICATION = emlearn
 
-BOARD ?= native
+BOARD ?= scum-devkit
 
 USEPKG += emlearn
 

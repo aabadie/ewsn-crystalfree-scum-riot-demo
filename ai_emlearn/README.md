@@ -5,6 +5,10 @@ in order to predict a value from a hand written digit image.
 The model is a [Scikit-Learn](https://scikit-learn.org) random forest estimator
 trained on the MNIST dataset.
 
+### Usage
+
+Just run `make flash term` from this directory.
+
 ### Expected output
 
 The default digit to predict is a hand-written '6', so the application output
@@ -35,6 +39,5 @@ The application comes with 3 Python scripts:
   $ ./train_model.py
   ```
   will just train the model.
-- `generate_model.py` is used to generate the `sonar.h` header file from the
-  `model` binary file. The script is called automatically by the build system
-  when the `model` binary file is updated.
+- `generate_model.py` is used to generate the `model.h` header file from the
+  `model` binary file.
