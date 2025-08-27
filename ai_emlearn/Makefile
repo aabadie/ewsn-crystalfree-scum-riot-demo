@@ -2,6 +2,8 @@ APPLICATION = emlearn
 
 BOARD ?= scum-devkit
 
+USEMODULE += fmt
+USEMODULE += shell
 USEPKG += emlearn
 
 RIOTBASE ?= $(CURDIR)/../RIOT

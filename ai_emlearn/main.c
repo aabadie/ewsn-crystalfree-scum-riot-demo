@@ -5,49 +5,71 @@
 #include <inttypes.h>
 #include <stdalign.h>
 #include <stdio.h>
+#include <string.h>
 
-#include "board.h"
-#include "stdio_uart.h"
-#include "thread.h"
-#include "periph/uart.h"
+#include "shell.h"
+#include "fmt.h"
 
 #include "model.h"
 
 #define IMG_SIZE 256U
-
 static alignas(float) uint8_t _digit[IMG_SIZE] = { 0 };
-static uint8_t _digit_pos = 0;
 
-static kernel_pid_t _main_pid;
+static int _clear_handler(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
 
-static void _uart_callback(void *arg, uint8_t data) {
-    (void)arg;
-    msg_t msg;
-    msg.content.value = (uint32_t)data;
-    msg_send(&msg, _main_pid);
+    memset(_digit, 0, sizeof(_digit));
+    return 0;
 }
+
+static int _load_handler(int argc, char **argv)
+{
+    if (argc < 3) {
+        printf("Usage: load <idx> <bytes as hex>\n");
+        return -1;
+    }
+
+    uint8_t idx = atoi(argv[1]);
+    fmt_hex_bytes(&_digit[idx * 32], argv[2]);
+
+    // For debugging what was received
+    // if (idx == 7) {
+    //     for (uint16_t i = 0; i < IMG_SIZE; i++) {
+    //         printf("%02x ", _digit[i]);
+    //         if (i % 32 == 31) {
+    //             puts("");
+    //         }
+    //     }
+    // }
+
+    return 0;
+}
+
+static int _infer_handler(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+
+    const float *digit_as_float = (const float *)(uintptr_t)_digit;
+    printf("Predicted digit: %" PRIi32 "\n",
+    model_predict(digit_as_float, IMG_SIZE >> 2));
+    return 0;
+}
+
+/* Declare the list of shell commands */
+static const shell_command_t shell_commands[] = {
+    { "clear", "Clear the image buffer", _clear_handler },
+    { "load", "Load an image line into internal buffer", _load_handler },
+    { "infer", "Infer the digit using emlearn", _infer_handler },
+    { NULL, NULL, NULL }
+};
 
 int main(void)
 {
-    _main_pid = thread_getpid();
-
-    /* Initialize first UART */
-    uart_init(UART_DEV(0), STDIO_UART_BAUDRATE, _uart_callback, NULL);
-
-    /* Wait for UART data */
-    msg_t msg;
-    msg_t msg_queue[8];
-    msg_init_queue(msg_queue, 8);
-
-    while (1) {
-        msg_receive(&msg);
-        _digit[_digit_pos++] = (uint8_t)msg.content.value;
-        if (_digit_pos == 0) {
-            const float *digit_as_float = (const float *)(uintptr_t)_digit;
-            printf("Predicted digit: %" PRIi32 "\n",
-                   model_predict(digit_as_float, IMG_SIZE >> 2));
-        }
-    }
-
+    /* Configure and start the shell */
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }
